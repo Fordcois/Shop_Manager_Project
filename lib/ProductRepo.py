@@ -17,4 +17,7 @@ class ProductRepo:
     
     def check_quantity(self,name):
         result = self.connection.execute('SELECT name,quantity from products where name =%s',[name])
-        print (f'{  result[0]["name"]   } Stock: {  result[0]["quantity"]   }')
+        if result == []:
+            print (f'No item called {name} found in the system!')
+        else:
+            print (f'{  result[0]["name"]   } Stock: {  result[0]["quantity"]   }')
