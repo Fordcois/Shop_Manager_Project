@@ -14,7 +14,7 @@ class Application():
         print ("Here's a list of all products:")
         print (self.dots)
         for product in product_repo.all():
-            print (f'* {product.name} - {product.unit_price} - {product.quantity}')
+            print (f'* {product.id} - {product.name} - {product.unit_price} - {product.quantity}')
     
     def return_all_orders(self):
         order_repo = OrderRepo(self._connection)
@@ -42,17 +42,16 @@ class Application():
         print (self.dots)
         print ('* [1] - View All Products and Current Stock')
         print ('* [2] - View All Current Orders')
-        print('* [3] - Check Stock Level of specific item')
-        # - [NeedToImplement] Add a New Item
-        # - [NeedToImplement] Check a Specific Order
-        # - [NeedToImplement] Generate a New Order?
+        print ('* [3] - Check Stock Level of specific item')
+        print ('* [4] - Add a New Item')
+        # - [NeedToImplement] Look-up existing order
+        # - [NeedToImplement] Generate a new order
 
 
         FeatureSelected=input('What would you like to do today?: ')
-        # Checks Input is valid 
         print (self.dots)
-
-        if FeatureSelected not in ['1','2','3']:
+        # Checks input is valid
+        if FeatureSelected not in ['1','2','3','4']:
             print (f' {FeatureSelected} is not a Valid input - Goodbye')
         
         # Return all the Products
@@ -68,9 +67,19 @@ class Application():
             SearchRequest=input('What item would you like to check on? : ')
             print (self.dots)
             self.check_stock_level(SearchRequest)
+        
+        # Add new item - Talks you through each input then runs command
+        elif FeatureSelected == '4':
+            print ("What's the name of the Product you'd like to add?")
+            name=input('Product Name: ')
+            print ("What's the unit price of the Product you'd like to add? (Format: 00.00)")
+            unit_price=input('Unit Price: £')
+            print ("What's the quantity of the item?")
+            quantity=input('Quantity: ')
+            self.create_item(name,unit_price,quantity)
+            print (f'{quantity} {name} added at a unit price of £{unit_price} Each')
 
-
-    
+            
 # This is what return a specific Order Should Look Like:
     # Order Number: 5
     # Customer Name: Ned Stark
