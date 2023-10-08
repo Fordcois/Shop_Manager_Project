@@ -3,7 +3,7 @@ class OrderClass():
         self.id = id
         self.customer_name = customer_name
         self.order_date = order_date
-        self.products_ordered=products_ordered
+        self.products_ordered = products_ordered
     
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
