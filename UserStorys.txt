@@ -26,7 +26,9 @@ I want to know on which date an order was placed.
 As a shop manager
 So I can manage orders
 I want to be able to create a new order.
+[IMPLEMENTED]
 
 As a shop manager
 So I can know which orders were made
 I want to assign each order to their corresponding item.
+[IMPLEMENTED]

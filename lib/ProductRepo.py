@@ -21,3 +21,7 @@ class ProductRepo:
             print (f'No item called {name} found in the system!')
         else:
             print (f'{  result[0]["name"]   } Stock: {  result[0]["quantity"]   }')
+
+    def get_name_from_id(self,product_id):
+        result = self.connection.execute('SELECT name from products where id =%s',[product_id])
+        return result

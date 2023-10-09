@@ -33,7 +33,6 @@ class OrderRepo:
                 count_dict[row["name"]] += 1
 
         order = OrderClass(order_id, rows[0]["customer_name"], rows[0]["order_date"], items_ordered )
-
         print(f"Order Number: {order.id}")
         print(f"Customer Name: {order.customer_name}")
         print(f"Order Placed: {order.order_date.strftime('%d-%m-%Y')}")
@@ -43,15 +42,12 @@ class OrderRepo:
 
     def create_order(self, customer_name, order_date):
         self.connection.execute('INSERT INTO orders (customer_name, order_date) VALUES (%s, %s)', [customer_name, order_date])
-        order_id_dict = self.connection.execute('SELECT id from products where id = (SELECT max(id) from products)')
-        return order_id_dict[0]["id"]
+        order_id_dict = self.connection.execute('SELECT id from orders where id = (SELECT max(id) from orders)')
+        return order_id_dict[0]['id']
 
     def add_product_to_order(self, order_id, product_id):
         self.connection.execute('INSERT INTO orders_products (order_id,product_id) VALUES (%s, %s)', [order_id, product_id])
     
-        
-
-        
 
 
 

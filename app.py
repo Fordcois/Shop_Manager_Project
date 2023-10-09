@@ -1,6 +1,7 @@
 from lib.database_connection import DatabaseConnection
 from lib.ProductRepo import *
 from lib.OrderRepo import *
+import re
 
 class Application():
     def __init__(self):
@@ -37,16 +38,21 @@ class Application():
 
     def create_new_order(self, customer_name, order_date):
         order_repo = OrderRepo(self._connection)
-        order_repo.create_order(customer_name, order_date)
-        
+        print(f'New Order for {customer_name} placed on {order_date}')
+        return order_repo.create_order(customer_name, order_date)
+
     def add_product_to_order(self, order_id, product_id):
         order_repo = OrderRepo(self._connection)
         order_repo.add_product_to_order(order_id, product_id)
-
-
-
-    # def create_order(self, customer_name, items_list)
-
+    
+    def call_on_id(self,product_id):
+        product_repo = ProductRepo (self._connection)
+        ItemName = product_repo.get_name_from_id(product_id)
+        if ItemName == []:
+            return None
+        else:
+            return ItemName[0]['name']
+        
 #    User Interface below 
     def run_user_interface(self):
         print (self.dots)
@@ -58,14 +64,11 @@ class Application():
         print ('* [4] - Add a new item')
         print ('* [5] - Check order')
         print ('* [6] - Create new order')
-        # - [NeedToImplement] Look-up existing order
-        # - [NeedToImplement] Generate a new order
-
 
         FeatureSelected = input('What would you like to do today?: ')
         print (self.dots)
         # Checks input is valid
-        if FeatureSelected not in ['1','2','3','4', '5']:
+        if FeatureSelected not in ['1','2','3','4', '5','6']:
             print (f' {FeatureSelected} is not a valid input - Goodbye')
         
         # Return all the Products
@@ -93,40 +96,52 @@ class Application():
             self.create_item(name,unit_price,quantity)
             print (f'{quantity} {name} added at a unit price of £{unit_price} Each')
 
+        # Check a Preexisting Order
         elif FeatureSelected == '5':
             print ("What order number would you like to check?")
             order_to_check = input('Order number: ')
             print (self.dots)
             self.check_order(order_to_check)
+        # Create a new Order
+        elif FeatureSelected == '6':
+#           Takes name for new order
+            print (f"What's the Customer Name?")
+            CustomerName = input('Name: ')
 
-        
+#           Takes a Date - Makes sure it is in the correct format before proceeding:
+            print (f"What's the date of the order? (Format YYYY-MM-DD)")
+            OrderDate = input('Date: ')
+            date_pattern = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+            if date_pattern.match(OrderDate) == None:
+                print (f"'{OrderDate}' is not a valid date format - Please start again using the format YYYY-MM-DD")
+                return None
+            print (self.dots)
+            NewOrderID=self.create_new_order(CustomerName,OrderDate)
+#           Loop of adding items to order before confirming
+            OrderIncomplete = True
+            print (f"Enter the Product ID of the item you would like to add to {CustomerName}'s Order")
+            print ("Enter 'DONE' When you're finished")
+            while OrderIncomplete == True:
+                CustomerInput=input('Enter Input: ')
+
+                if CustomerInput.upper() == 'DONE':
+                    OrderIncomplete = False
+
+                else:
+                    ItemToAdd=self.call_on_id(int(CustomerInput))
+                    if ItemToAdd == None:
+                        print (f'No Such product with ID {CustomerInput}')
+                    else:
+                        self.add_product_to_order(NewOrderID,int(CustomerInput))
+                        print (f"Added 1x {ItemToAdd} to {CustomerName}'s order")
+                        print (f"Enter another product ID to add to order or enter DONE when you've finished")
 
 
-# This is what return a specific Order Should Look Like:
-    # Order Number: 5
-    # Customer Name: Ned Stark
-    # Order Placed: 10/01/2023
-    # Ordered: 
-    # 1X Baked Beans
-    # 5X Diamonds
+            print (self.dots)
+            print ('Order Confirmed'.center(75))
+            print (self.dots)
+            self.check_order(NewOrderID)
 
-    # Order Number: 5
-    # Customer Name: Ned Stark
-    # Order Placed: 10/01/2023
-    # Ordered: 
-    # 1X Baked Beans
-    # 1 x Baked Beans
-
-
-
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#–#-#-#-#-#-#-#-#-#-#–#–#-#-#
-#     Commands below here are for testing purposes only
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#–#-#-#-#-#-#-#-#-#-#–#–#-#-#
-trial=Application()
-# Trial.check_stock_level('Twigs')
-# Trial.check_stock_level('Bread')
-# Trial.check_stock_level('Diamonds')
-trial.check_order(3)
-# Trial.run_user_interface()
-# trial.create_new_order('Davey Jones', '1801-03-20')
-# trial.add_product_to_order(3,1)
+if __name__ == '__main__':
+    app = Application()
+    app.run()
